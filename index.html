@@ -105,6 +105,26 @@ td.neg{color:var(--neg)}
 .inv{background:linear-gradient(120deg,#1d176b,#2a1f8f 55%,#4a33b8);color:#fff;border-radius:12px;padding:18px 20px;line-height:1.6}
 .inv .l{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#9fe3f5}
 .inv b{color:#c7f0fb}
+.tk{border:1.5px solid #c9c0f2;background:linear-gradient(135deg,#faf8ff,#f0fbfe)}
+.tk .grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:22px;align-items:start}
+@media(max-width:1100px){.tk .grid{grid-template-columns:minmax(0,1fr)}}
+.tk .amt{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 8px}
+.tk .amt .in{display:flex;align-items:center;border:1.5px solid #c9c0f2;border-radius:10px;background:#fff;padding:0 12px}
+.tk .amt .in span{color:var(--muted);font-weight:700}
+.tk .amt input{border:0;outline:0;width:150px;font-family:var(--f-d);font-size:26px;font-weight:700;color:var(--indigo);padding:8px 6px;text-align:left;background:transparent}
+.tk .amt input:focus{outline:0}
+.tk .chips{display:flex;gap:6px;flex-wrap:wrap}
+.tk .chips button{border:1px solid var(--line);background:#fff;color:var(--indigo);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:700;cursor:pointer}
+.tk .chips button.on{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.tk input[type=range]{width:100%;accent-color:var(--violet);margin:4px 0 2px}
+.tk .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.tk .tile{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.tk .tile .l{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tk .tile .v{font-family:var(--f-d);font-size:22px;font-weight:700;color:var(--indigo);display:block;margin-top:2px}
+.tk .tile .s{font-size:12px;color:var(--muted)}
+.tk .tile.big{background:var(--indigo);border-color:var(--indigo)}
+.tk .tile.big .l,.tk .tile.big .s{color:#cfe9f5}.tk .tile.big .v{color:#fff}
+.tk .warn{color:var(--neg);font-size:12.5px;margin-top:6px}
 footer{max-width:1480px;margin:0 auto;padding:0 24px 28px;color:var(--muted);font-size:11.5px;line-height:1.5}
 </style>
 </head>
@@ -176,6 +196,23 @@ footer{max-width:1480px;margin:0 auto;padding:0 24px 28px;color:var(--muted);fon
 
 <main>
   <div class="kpis" id="kpis"></div>
+  <div class="card tk" id="ticket">
+    <h2 data-t="tk_h">Simule o seu investimento</h2><div class="sub" id="tkSub"></div>
+    <div class="grid">
+      <div>
+        <div class="amt"><label class="in"><span>R$</span><input id="tkIn" type="text" inputmode="numeric" aria-label="Valor do aporte"></label>
+          <div class="chips" id="tkChips"><button data-a="100000">100k</button><button data-a="250000">250k</button><button data-a="400000">400k</button><button data-a="1000000">1 mi</button></div></div>
+        <input type="range" id="tkRange" min="50000" max="3000000" step="25000" aria-label="Valor do aporte">
+        <div class="warn" id="tkWarn"></div>
+        <div class="tiles" id="tkTiles"></div>
+      </div>
+      <div>
+        <div class="legend"><span><i style="background:var(--violet)"></i><span data-t="tk_lg1">Valor implícito da sua participação</span></span><span><i style="background:#17143a;height:2px;vertical-align:3px"></i><span data-t="tk_lg2">Valor aportado</span></span></div>
+        <svg id="chTk" viewBox="0 0 640 260" role="img" aria-label="Projeção do investimento"></svg>
+        <div class="note" id="tkNote"></div>
+      </div>
+    </div>
+  </div>
   <div class="row2">
     <div class="card"><h2 data-t="c_rev">Receita líquida, EBITDA e lucro líquido</h2><div class="sub" id="subRev">R$ milhões por ano</div>
       <div class="legend"><span><i style="background:var(--indigo)"></i><span data-t="lg_liq">Receita líquida</span></span><span><i style="background:var(--cyan)"></i>EBITDA</span><span><i style="background:var(--magenta)"></i><span data-t="lg_ll">Lucro líquido</span></span></div>
@@ -355,7 +392,10 @@ pt:{title:"rhapsody · Junte-se à rhapsody",g_h1:"Junte-se à rhapsody",g_p:"Á
  note:(s,c,l)=>`${s}: ${c} clientes novos por KAM por ano × ${l} licenças por cliente.`,mio:"R$ milhões",kams:"KAMs",thou:" mil",licT:"licenças",peak:"pico",
  subCash:(s,r)=>`${s} · R$ milhões · rodada de ${r} em jan/2027`,subUses:p=>`De jan/2027 até o pico de caixa (${p})`,
  usesTot:(t,mb,pm,pk,pp,sf,nd)=>`Total de gastos até o pico: <b>${t}</b>. As vendas pagam <b>${mb}</b> (${pm}); a rodada cobre <b>${pk}</b> (${pp}), mais ${sf} de margem de segurança = <b>${nd}</b>.`,
- invL:"Retorno para o investidor",inv:(o)=>`Um investimento de <b>${o.r}</b> a um pré-money de <b>${o.pre}</b> (€ ${o.eur} mi × ${o.fx}) compra <b>${o.st}</b>. Na saída em ${o.y}, com ARR de ${o.arr} × ${o.m} = <b>${o.ev}</b> e ${o.dil} de diluição, a participação vale <b>${o.val}</b>: MOIC de <b>${o.moic}</b> e TIR de <b>${o.irr}</b> ao ano.`},
+ invL:"Retorno para o investidor",tk_h:"Simule o seu investimento",tk_lg1:"Valor implícito da sua participação",tk_lg2:"Valor aportado",
+ tkSub:(p,r,po)=>`Digite o valor do aporte. Pré-money de ${p} + rodada de ${r} = pós-money de ${po}.`,tkOver:"Valor acima da rodada total — ajuste a rodada no painel ao lado.",
+ tk1:"Participação na entrada",tk1s:(s,r)=>`${s} da rodada de ${r}`,tk2:"Participação na saída",tk2s:d=>`após ${d} de diluição futura`,tk3:y=>`Valor na saída (${y})`,tk3s:ev=>`empresa avaliada em ${ev}`,tk4:"Múltiplo e TIR",tk4s:(i,n)=>`TIR de ${i} ao ano em ${n} anos`,
+ tkNote:(m,d,y)=>`Valor implícito em cada ano = ARR de dezembro × ${m}x × sua participação após ${d} de diluição. Saída considerada em ${y} (★). Projeção ilustrativa, não garantida.`,inv:(o)=>`Um investimento de <b>${o.r}</b> a um pré-money de <b>${o.pre}</b> (€ ${o.eur} mi × ${o.fx}) compra <b>${o.st}</b>. Na saída em ${o.y}, com ARR de ${o.arr} × ${o.m} = <b>${o.ev}</b> e ${o.dil} de diluição, a participação vale <b>${o.val}</b>: MOIC de <b>${o.moic}</b> e TIR de <b>${o.irr}</b> ao ano.`},
 fr:{title:"rhapsody · Rejoignez rhapsody",g_h1:"Rejoignez rhapsody",g_p:"Espace réservé aux investisseurs invités : business plan de rhapsody LATAM 2027–2031 et simulateur de rendement.",g_btn:"Accéder",g_small:"Pas de mot de passe ? Contactez l’équipe rhapsody.",pw:"Mot de passe",show:"Afficher le mot de passe",hide:"Masquer le mot de passe",err:"Mot de passe incorrect. Veuillez réessayer.",
  h_eb:"Investisseurs · rhapsody LATAM",h_h1:"Business plan 2027–2031 · simulateur",h_out:"Déconnexion",a_scen:"Scénario",s0:"Prudent",s1:"Réel",s2:"Optimiste",a_motor:"Moteur commercial",f_cpk:"Nouveaux clients par KAM et par an",f_cpk_s:"prudent 4 · réel 6 · optimiste 8",f_lpc:"Licences par client",f_price:"Prix par licence (R$/mois)",f_churn:"Attrition annuelle des clients (%)",f_extra:"Revenus additionnels",f_extra_s:"Sprint Pilots, conseil, Use Case Factory",yes:"Oui",no:"Non",
  a_team:"Équipe commerciale",f_contract:"Contrat des KAM",f_sal:"Salaire / facture de chaque KAM (R$/mois)",f_com:"Commission moyenne par KAM (R$/mois)",n_team:"9 KAM : 4 en janv. 2027, 4 en janv. 2028 et 1 en mars 2028. Équipe maintenue jusqu’en 2031. CLT = salarié (charges sociales) ; PJ = prestataire.",a_costs:"Coûts",f_roy:"Redevance à rhapsody Global (%)",f_fx:"Taux de change (R$ pour 1 €)",a_round:"Levée et sortie",f_round:"Levée de fonds (R$)",f_val:"Valorisation pré-money (€)",f_mult:"Multiple d’ARR à la sortie",f_year:"Année de sortie",f_dil:"Dilution future (%)",reset:"Revenir au BP d’origine",
@@ -368,7 +408,10 @@ fr:{title:"rhapsody · Rejoignez rhapsody",g_h1:"Rejoignez rhapsody",g_p:"Espace
  note:(s,c,l)=>`${s} : ${c} nouveaux clients par KAM et par an × ${l} licences par client.`,mio:"millions de R$",kams:"KAM",thou:" k",licT:"licences",peak:"pic",
  subCash:(s,r)=>`${s} · millions de R$ · levée de ${r} en janv. 2027`,subUses:p=>`De janv. 2027 jusqu’au pic de trésorerie (${p})`,
  usesTot:(t,mb,pm,pk,pp,sf,nd)=>`Total des dépenses jusqu’au pic : <b>${t}</b>. Les ventes en financent <b>${mb}</b> (${pm}) ; la levée couvre <b>${pk}</b> (${pp}), plus ${sf} de marge de sécurité = <b>${nd}</b>.`,
- invL:"Rendement pour l’investisseur",inv:(o)=>`Un investissement de <b>${o.r}</b> sur une valorisation pré-money de <b>${o.pre}</b> (${o.eur} M€ × ${o.fx}) donne <b>${o.st}</b> du capital. À la sortie en ${o.y}, avec un ARR de ${o.arr} × ${o.m} = <b>${o.ev}</b> et ${o.dil} de dilution, la participation vaut <b>${o.val}</b> : MOIC de <b>${o.moic}</b> et TRI de <b>${o.irr}</b> par an.`}
+ invL:"Rendement pour l’investisseur",tk_h:"Simulez votre investissement",tk_lg1:"Valeur implicite de votre participation",tk_lg2:"Montant investi",
+ tkSub:(p,r,po)=>`Saisissez le montant investi. Pré-money de ${p} + levée de ${r} = post-money de ${po}.`,tkOver:"Montant supérieur à la levée totale — ajustez la levée dans le panneau latéral.",
+ tk1:"Participation à l’entrée",tk1s:(s,r)=>`${s} de la levée de ${r}`,tk2:"Participation à la sortie",tk2s:d=>`après ${d} de dilution future`,tk3:y=>`Valeur à la sortie (${y})`,tk3s:ev=>`entreprise valorisée à ${ev}`,tk4:"Multiple et TRI",tk4s:(i,n)=>`TRI de ${i} par an sur ${n} ans`,
+ tkNote:(m,d,y)=>`Valeur implicite chaque année = ARR de décembre × ${m}x × votre participation après ${d} de dilution. Sortie retenue en ${y} (★). Projection indicative, non garantie.`,inv:(o)=>`Un investissement de <b>${o.r}</b> sur une valorisation pré-money de <b>${o.pre}</b> (${o.eur} M€ × ${o.fx}) donne <b>${o.st}</b> du capital. À la sortie en ${o.y}, avec un ARR de ${o.arr} × ${o.m} = <b>${o.ev}</b> et ${o.dil} de dilution, la participation vaut <b>${o.val}</b> : MOIC de <b>${o.moic}</b> et TRI de <b>${o.irr}</b> par an.`}
 };
 let LANG="pt";try{const s=sessionStorage.getItem("rh_lang");LANG=s||((navigator.language||"").toLowerCase().startsWith("fr")?"fr":"pt")}catch(e){}
 if(!L[LANG])LANG="pt";
@@ -401,6 +444,7 @@ document.getElementById("logout").onclick=()=>{try{sessionStorage.removeItem("rh
 /* ---------- simulador ---------- */
 const clone=o=>JSON.parse(JSON.stringify(o));
 let I=clone(DEFAULTS);
+const TICKET0=400000;let TICKET=TICKET0;
 const $=s=>document.querySelector(s);
 const nf=d=>new Intl.NumberFormat(LANG==="fr"?"fr-FR":"pt-BR",{maximumFractionDigits:d,minimumFractionDigits:d});
 const mi=v=>{const s=(v<0?"−":""),n=nf(Math.abs(v)>=1e7?1:2).format(Math.abs(v)/1e6);return LANG==="fr"?s+n+" M R$":s+"R$ "+n+" mi"};
@@ -411,7 +455,34 @@ document.querySelectorAll("input[data-k]").forEach(el=>el.addEventListener("inpu
   if(el.dataset.k==="exitYear"){if(v<2027||v>2031)return;v=Math.round(v)}I[el.dataset.k]=v;render()}));
 function seg(id,cb){$(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;$(id).querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));cb(b.dataset.v);render()})}
 seg("#segScen",v=>{I.scen=+v;I.clientsPerKam=I.scenClients[I.scen];fill()});seg("#segKam",v=>I.kamContract=v);seg("#segExtra",v=>I.extras=+v);
-$("#reset").onclick=()=>{I=clone(DEFAULTS);fill();render()};
+$("#reset").onclick=()=>{I=clone(DEFAULTS);TICKET=TICKET0;fill();render()};
+const tkIn=document.getElementById("tkIn"),tkRange=document.getElementById("tkRange");
+tkIn.addEventListener("input",()=>{const v=parseInt(tkIn.value.replace(/\D/g,""),10);if(isNaN(v))return;TICKET=v;renderTicket(runModel(I),true)});
+tkIn.addEventListener("blur",()=>renderTicket(runModel(I)));
+tkRange.addEventListener("input",()=>{TICKET=+tkRange.value;renderTicket(runModel(I))});
+document.getElementById("tkChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;TICKET=+b.dataset.a;renderTicket(runModel(I))});
+function renderTicket(R,typing){
+  const A=R.A,post=R.post||1,st=TICKET/post,stx=st*(1-I.dilution),fr=LANG==="fr",P=v=>nf(2).format(v*100)+(fr?"\u00a0%":"%");
+  if(!typing)tkIn.value=nf(0).format(TICKET);tkRange.value=Math.min(3000000,Math.max(50000,TICKET));
+  document.querySelectorAll("#tkChips button").forEach(b=>b.classList.toggle("on",+b.dataset.a===TICKET));
+  const exitVal=R.exitEV*stx,moic=TICKET?exitVal/TICKET:0,irr=moic>0?Math.pow(moic,1/(I.exitYear-2026))-1:-1,share=I.round?TICKET/I.round:0;
+  $("#tkSub").textContent=L[LANG].tkSub(mi(R.pre),mi(I.round),mi(post));
+  $("#tkWarn").textContent=TICKET>I.round?T("tkOver"):"";
+  const tl=[[T("tk1"),P(st),L[LANG].tk1s(P(share),mi(I.round))],[T("tk2"),P(stx),L[LANG].tk2s(pct(I.dilution))],
+    [L[LANG].tk3(I.exitYear),mi(exitVal),L[LANG].tk3s(mi(R.exitEV)),1],[T("tk4"),nf(2).format(moic)+"x",L[LANG].tk4s(pct(irr),I.exitYear-2026),1]];
+  $("#tkTiles").innerHTML=tl.map(x=>`<div class="tile${x[3]?" big":""}"><span class="l">${x[0]}</span><span class="v num">${x[1]}</span><span class="s">${x[2]}</span></div>`).join("");
+  // projeção anual
+  const yrs=A.years,vals=yrs.map((y,i)=>A.arrDec[i]*I.multiple*stx),W=640,H=260,pl=56,pr=10,pt=22,pb=28,mx=Math.max(TICKET,...vals)*1.15||1,y=v=>pt+(1-v/mx)*(H-pt-pb),gw=(W-pl-pr)/yrs.length;
+  let g="";for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#eeecf6"/><text x="${pl-6}" y="${y(v)+4}" font-size="11" fill="#5f5b7d" text-anchor="end">${mk(v)}</text>`}
+  yrs.forEach((yr,i)=>{const cx=pl+gw*i+gw/2,v=vals[i],ex=yr===I.exitYear,m=TICKET?v/TICKET:0;
+    g+=`<rect x="${cx-24}" y="${y(v)}" width="48" height="${H-pb-y(v)}" rx="3" fill="${ex?"#2a1f8f":"#5b4bc4"}" opacity="${yr>I.exitYear?.35:1}"><title>${yr}: ${mi(v)}</title></rect>`;
+    g+=`<text x="${cx}" y="${y(v)-16}" font-size="10.5" font-weight="700" fill="#17143a" text-anchor="middle">${mk(v)}</text><text x="${cx}" y="${y(v)-4}" font-size="10" font-weight="700" fill="${m>=1?"#0f7b5a":"#c2410c"}" text-anchor="middle">${nf(1).format(m)}x</text>`;
+    g+=`<text x="${cx}" y="${H-8}" font-size="12" fill="${ex?"#2a1f8f":"#5f5b7d"}" font-weight="${ex?700:400}" text-anchor="middle">${yr}${ex?" ★":""}</text>`});
+  g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(TICKET)}" y2="${y(TICKET)}" stroke="#17143a" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${W-pr}" y="${y(TICKET)-5}" font-size="11" font-weight="700" fill="#17143a" text-anchor="end">${mk(TICKET)}</text>`;
+  $("#chTk").innerHTML=g;
+  $("#tkNote").textContent=L[LANG].tkNote(nf(1).format(I.multiple),pct(I.dilution),I.exitYear);
+}
+const mk=v=>{const a=Math.abs(v);return a>=1e6?(LANG==="fr"?nf(a>=1e7?1:2).format(v/1e6)+" M":nf(a>=1e7?1:2).format(v/1e6)+" mi"):nf(0).format(v/1e3)+"k"};
 
 function scale(vals,pad){const mx=Math.max(0,...vals),mn=Math.min(0,...vals),sp=(mx-mn)||1;return{mx:mx+sp*(pad||.08),mn:mn<0?mn-sp*(pad||.08):0}}
 function bars(svg,cats,series,colors,fmt){
@@ -448,6 +519,7 @@ function render(){
     [T("k")[7],pct(R.irr),L[LANG].kIrr(mi(I.round),I.exitYear-2026)],
   ];
   $("#kpis").innerHTML=K.map(k=>`<div class="kpi${k[3]?" hi":""}"><span class="l">${k[0]}</span><span class="v num">${k[1]}</span><span class="s">${k[2]}</span></div>`).join("");
+  renderTicket(R);
   $("#kpis").querySelectorAll(".v span.ok,.v span.bad").forEach(s=>s.parentElement.classList.add(s.className));
   const cats=A.years.map(String),f1=(v,s)=>nf(s?1:2).format(v/1e6);
   bars($("#chRev"),cats,[A.liq,A.ebitda,A.ll],["#2a1f8f","#3fb8dc","#b45be0"],f1);
